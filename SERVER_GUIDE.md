@@ -13,6 +13,7 @@ ssh -i /home/user/Documents/Projects/Oracle/ssh-key-2026-03-20.key ubuntu@140.23
 | :--- | :--- |
 | **Server IP** | `140.238.201.159` |
 | **Domain** | `https://agencycrew.cppl.com.ki` |
+| **Mobile App (APK)** | `https://agencycrew.cppl.com.ki/agency-crew.apk` |
 | **Username** | `ubuntu` |
 | **Identity Key** | `/home/user/Documents/Projects/Oracle/ssh-key-2026-03-20.key` |
 
