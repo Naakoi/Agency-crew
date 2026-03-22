@@ -320,12 +320,28 @@
             .form-row { grid-template-columns: 1fr; }
             .booking-grid { grid-template-columns: 1fr; }
 
-            /* Compact Stats for Mobile */
-            .stats-row { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-            .stat-card { padding: 14px 16px; border-radius: 12px; }
-            .stat-card .stat-value { font-size: 22px; margin: 5px 0 2px; }
-            .stat-card .stat-icon { width: 34px; height: 34px; font-size: 15px; margin-bottom: 8px; border-radius: 8px; }
-            .stat-card .stat-label { font-size: 9.5px; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            /* Carousel Stats for Mobile */
+            .stats-row { 
+                display: flex; 
+                flex-wrap: nowrap; 
+                overflow-x: auto; 
+                gap: 12px; 
+                margin-bottom: 24px;
+                padding-bottom: 10px;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+            }
+            .stats-row::-webkit-scrollbar { height: 4px; }
+            .stats-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+            .stat-card { 
+                flex: 0 0 135px; 
+                padding: 14px 16px; 
+                border-radius: 12px; 
+                scroll-snap-align: start;
+            }
+            .stat-card .stat-value { font-size: 22px; margin: 4px 0 2px; }
+            .stat-card .stat-icon { width: 34px; height: 34px; font-size: 15px; margin-bottom: 10px; border-radius: 8px; }
+            .stat-card .stat-label { font-size: 10.5px; letter-spacing: 0.5px; white-space: normal; line-height: 1.3; }
         }
     </style>
     @stack('styles')
