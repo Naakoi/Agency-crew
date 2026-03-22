@@ -330,6 +330,9 @@
             <i class="fas fa-list-check"></i> <span>Activity Log</span>
         </a>
         @endif
+        <a href="/agency-crew.apk" style="color:#0e9ae0; background:rgba(14,154,224,0.1); margin-top:10px;">
+            <i class="fas fa-download"></i> <span>Get Mobile App</span>
+        </a>
     </nav>
 
     <div class="sidebar-footer">
