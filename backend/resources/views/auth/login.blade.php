@@ -66,9 +66,11 @@
 <body>
 <div class="login-box">
     <div class="login-brand">
-        <div class="login-logo"><i class="fas fa-anchor"></i></div>
-        <h1>CPPL Agency</h1>
-        <p>Crew Accommodation System</p>
+        <div class="login-logo" style="background: none; padding: 0;">
+            <img src="/images/logo.svg" alt="CPPL Logo" style="width: 80px; height: 80px;">
+        </div>
+        <h1>CPPL</h1>
+        <p>Agency Crew Accommodation</p>
     </div>
 
     @if($errors->any())

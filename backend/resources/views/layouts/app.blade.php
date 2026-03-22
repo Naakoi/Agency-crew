@@ -361,9 +361,12 @@
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-brand" style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-            <div class="logo-top">CPPL Agency</div>
-            <h2>Crew Accommodation</h2>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="/images/logo.svg" alt="CPPL Logo" style="height: 44px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+            <div>
+                <div class="logo-top">CPPL</div>
+                <h2 style="font-size: 13px; opacity: 0.9;">Agency Crew</h2>
+            </div>
         </div>
         <button id="sidebarClose" class="mobile-close-btn">
             <i class="fas fa-times"></i>
