@@ -2,9 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiService {
-  // Use 10.0.2.2 for Android Emulator to reach localhost on the host machine
-  // Adjust this to your local IP if testing on a real device
-  static const String baseUrl = "http://10.0.2.2:8000/api";
+  // Production URL for the Oracle Cloud instance (Secure HTTPS)
+  static const String baseUrl = "https://agencycrew.cppl.com.ki/api";
   
   final Dio _dio = Dio(BaseOptions(
     baseUrl: baseUrl,
