@@ -317,8 +317,15 @@
             .sidebar-overlay.show { display: block; }
             
             .main { margin-left: 0; padding: 80px 15px 20px; }
-            .form-row, .stats-row { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
             .booking-grid { grid-template-columns: 1fr; }
+
+            /* Compact Stats for Mobile */
+            .stats-row { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+            .stat-card { padding: 14px 16px; border-radius: 12px; }
+            .stat-card .stat-value { font-size: 22px; margin: 5px 0 2px; }
+            .stat-card .stat-icon { width: 34px; height: 34px; font-size: 15px; margin-bottom: 8px; border-radius: 8px; }
+            .stat-card .stat-label { font-size: 9.5px; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         }
     </style>
     @stack('styles')
