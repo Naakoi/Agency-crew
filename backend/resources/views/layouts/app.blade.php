@@ -283,22 +283,57 @@
         .pagination a:hover { background: rgba(26,120,194,0.2); }
         .pagination span.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+        .mobile-header {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 22px;
+            background: var(--navy2);
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 101;
+        }
+        .mobile-header .logo-top {
+            font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 1px;
+        }
+
         /* ── Responsive ──────────────────────────────────────────── */
         @media (max-width: 768px) {
-            .sidebar { width: 60px; }
-            .sidebar-brand h2, .sidebar-brand .logo-top,
-            .sidebar nav a span, .nav-section, .sidebar-footer .user-name,
-            .sidebar-footer .user-role, .sidebar-footer .btn-logout span { display: none; }
-            .main { margin-left: 60px; padding: 18px; }
-            .form-row { grid-template-columns: 1fr; }
-            .stats-row { grid-template-columns: 1fr; }
+            .mobile-header { display: flex; }
+            .sidebar { 
+                transform: translateX(-100%); 
+                width: 260px; 
+                transition: transform 0.3s ease;
+                z-index: 105;
+                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+            }
+            .sidebar.show { transform: translateX(0); }
+            
+            .sidebar-overlay {
+                display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.6); z-index: 104; backdrop-filter: blur(2px);
+            }
+            .sidebar-overlay.show { display: block; }
+            
+            .main { margin-left: 0; padding: 80px 15px 20px; }
+            .form-row, .stats-row { grid-template-columns: 1fr; }
+            .booking-grid { grid-template-columns: 1fr; }
         }
     </style>
     @stack('styles')
 </head>
 <body>
 
-<div class="sidebar">
+<div class="mobile-header">
+    <div class="logo-top">CPPL Agency</div>
+    <button id="sidebarToggle" style="color:#fff; background:transparent; border:none; font-size:20px; cursor:pointer;">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="sidebar" id="sidebar">
     <div class="sidebar-brand">
         <div class="logo-top">CPPL Agency</div>
         <h2>Crew Accommodation</h2>
@@ -369,6 +404,22 @@
 </main>
 
 <script>
+    // Mobile Sidebar Toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    if(sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            sidebarOverlay.classList.toggle('show');
+        });
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+        });
+    }
+
     // Auto-dismiss alerts
     setTimeout(() => {
         document.querySelectorAll('.alert').forEach(a => {
