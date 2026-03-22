@@ -64,6 +64,7 @@
         .sidebar-brand h2 {
             font-size: 15px; font-weight: 800; color: #fff; line-height: 1.3;
         }
+        .mobile-close-btn { display: none; background: transparent; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 5px; }
         .nav-section { padding: 16px 12px 8px; font-size: 10px; font-weight: 600;
             letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
         .sidebar nav a {
@@ -299,16 +300,18 @@
         }
 
         /* ── Responsive ──────────────────────────────────────────── */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .mobile-header { display: flex; }
             .sidebar { 
                 transform: translateX(-100%); 
-                width: 260px; 
-                transition: transform 0.3s ease;
+                width: 280px; 
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 z-index: 105;
-                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+                box-shadow: 10px 0 30px rgba(0,0,0,0.6);
+                overflow-y: auto;
             }
             .sidebar.show { transform: translateX(0); }
+            .mobile-close-btn { display: block !important; }
             
             .sidebar-overlay {
                 display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -357,9 +360,14 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-        <div class="logo-top">CPPL Agency</div>
-        <h2>Crew Accommodation</h2>
+    <div class="sidebar-brand" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <div class="logo-top">CPPL Agency</div>
+            <h2>Crew Accommodation</h2>
+        </div>
+        <button id="sidebarClose" class="mobile-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
     <div class="nav-section">Main</div>
@@ -429,19 +437,22 @@
 <script>
     // Mobile Sidebar Toggle
     const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarClose = document.getElementById('sidebarClose');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    if(sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('show');
-            sidebarOverlay.classList.toggle('show');
-        });
-        sidebarOverlay.addEventListener('click', () => {
-            sidebar.classList.remove('show');
-            sidebarOverlay.classList.remove('show');
-        });
-    }
+    const toggleSidebar = () => {
+        sidebar.classList.toggle('show');
+        sidebarOverlay.classList.toggle('show');
+    };
+    const closeSidebar = () => {
+        sidebar.classList.remove('show');
+        sidebarOverlay.classList.remove('show');
+    };
+
+    if(sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
+    if(sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+    if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
 
     // Auto-dismiss alerts
     setTimeout(() => {
