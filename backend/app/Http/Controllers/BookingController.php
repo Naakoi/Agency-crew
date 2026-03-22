@@ -106,9 +106,15 @@ class BookingController extends Controller
             'status'         => 'required|in:booked,pickup_to_hotel,in_hotel,pickup_to_plane',
         ]);
 
+        $oldStatus = $booking->status;
         $booking->update($data);
         $booking->load('crew'); // Load crew to access full_name for logging
         \App\Models\ActivityLog::log('updated_booking', "Updated booking #{$booking->id} for {$booking->crew->full_name}", $booking);
+
+        if ($oldStatus !== $booking->status) {
+            \App\Events\BookingStatusChanged::dispatch($booking, $oldStatus, $booking->status, auth()->id());
+        }
+
         return redirect()->route('bookings.show', $booking)->with('success', 'Booking updated!');
     }
 
@@ -122,12 +128,13 @@ class BookingController extends Controller
 
     public function toggle(Request $request, Booking $booking)
     {
+        $oldStatus = $booking->status;
         $statusSequence = ['booked', 'pickup_to_hotel', 'in_hotel', 'pickup_to_plane', 'cancelled'];
         
         if ($request->has('status') && in_array($request->status, $statusSequence)) {
             $booking->status = $request->status;
         } else {
-            $currentIndex = array_search($booking->status, $statusSequence);
+            $currentIndex = array_search($oldStatus, $statusSequence);
             if ($currentIndex === false) $currentIndex = -1;
             $nextIndex = ($currentIndex + 1) % count($statusSequence);
             $booking->status = $statusSequence[$nextIndex];
@@ -135,6 +142,10 @@ class BookingController extends Controller
         
         $booking->status_updated_by = auth()->id();
         $booking->save();
+
+        if ($oldStatus !== $booking->status) {
+            \App\Events\BookingStatusChanged::dispatch($booking, $oldStatus, $booking->status, auth()->id());
+        }
         
         $booking->statusLogs()->create([
             'status' => $booking->status,

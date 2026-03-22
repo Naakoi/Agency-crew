@@ -34,6 +34,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me', fn(Request $r) => response()->json($r->user()));
 
+    Route::post('/fcm-token', function (Request $r) {
+        $r->validate(['token' => 'required|string', 'device_type' => 'nullable|string']);
+        \App\Models\FcmToken::updateOrCreate(
+            ['user_id' => $r->user()->id, 'token' => $r->token],
+            ['device_type' => $r->device_type ?? 'mobile']
+        );
+        return response()->json(['message' => 'Token saved successfully']);
+    });
+
     // Bookings
     Route::get('/bookings', function (Request $r) {
         $q = \App\Models\Booking::with(['crew', 'company', 'hotel', 'statusLogs.user'])->orderByDesc('created_at');

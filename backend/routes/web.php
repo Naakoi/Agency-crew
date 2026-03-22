@@ -42,6 +42,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', UserManagementController::class);
         Route::get('activity-log', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('admin.activity-log');
     });
+
+    Route::post('/fcm-token', function (\Illuminate\Http\Request $r) {
+        $r->validate(['token' => 'required|string', 'device_type' => 'nullable|string']);
+        \App\Models\FcmToken::updateOrCreate(
+            ['user_id' => $r->user()->id, 'token' => $r->token],
+            ['device_type' => $r->device_type ?? 'web']
+        );
+        return response()->json(['message' => 'Token saved globally']);
+    })->name('fcm.token');
 });
 
 Route::middleware('auth')->group(function () {

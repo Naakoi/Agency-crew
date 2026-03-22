@@ -477,5 +477,74 @@
         });
     }
 </script>
+    <!-- Firebase JS Setup for Web Push -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAM2hqloZX6Qu1sshQIhQcpzAllr--hPgc",
+            authDomain: "agency-accommodation.firebaseapp.com",
+            projectId: "agency-accommodation",
+            storageBucket: "agency-accommodation.firebasestorage.app",
+            messagingSenderId: "1034441888269",
+            appId: "1:1034441888269:web:f59f94a91679c87cb33b44"
+        };
+
+        if (firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const messaging = firebase.messaging();
+
+        function requestNotificationPermission() {
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    // Get Registration Token
+                    messaging.getToken({ vapidKey: 'BOGUS_VAPID_KEY_NOT_NEEDED_FOR_FIREBASE_DEFAULT' }).then((currentToken) => {
+                        if (currentToken) {
+                            sendTokenToServer(currentToken);
+                        } else {
+                            console.log('No registration token available. Request permission to generate one.');
+                        }
+                    }).catch((err) => {
+                        console.log('An error occurred while retrieving token. ', err);
+                    });
+                }
+            });
+        }
+
+        // We can use the default push server without VAPID but let's just attempt getToken directly
+        // Firebase handles the default VAPID if project is properly configured.
+        messaging.getToken().then((currentToken) => {
+            if (currentToken) {
+                sendTokenToServer(currentToken);
+            } else {
+                requestNotificationPermission();
+            }
+        }).catch((err) => {
+            console.log('FCM Error: ', err);
+        });
+
+        function sendTokenToServer(token) {
+            fetch("{{ route('fcm.token') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ token: token, device_type: 'web' })
+            }).then(r => r.json()).then(data => console.log('FCM Token Saved:', data))
+              .catch(e => console.error('Failed to save FCM token:', e));
+        }
+
+        // Handle incoming foreground messages
+        messaging.onMessage((payload) => {
+            console.log('Message received in foreground: ', payload);
+            // Optionally, we could show a Bootstrap Toast here
+            if (payload.notification) {
+                alert(payload.notification.title + "\n" + payload.notification.body);
+            }
+        });
+    </script>
 </body>
 </html>
