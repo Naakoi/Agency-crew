@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Agency Crew Accommodation') — CPPL</title>
+    
+    <!-- PWA Setup -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0e9ae0">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -247,8 +254,8 @@
         /* ── Table ───────────────────────────────────────────────── */
         .table-wrap { overflow-x: auto; border-radius: var(--radius); }
         table { width: 100%; border-collapse: collapse; }
-        table th { padding: 12px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); background: rgba(255,255,255,0.03); text-align: left; }
-        table td { padding: 14px 16px; border-top: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+        table th { padding: 12px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); background: rgba(255,255,255,0.03); text-align: left; white-space: nowrap; }
+        table td { padding: 14px 16px; border-top: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; white-space: nowrap; }
         table tr:hover td { background: rgba(255,255,255,0.02); }
 
         /* ── Alert toast ─────────────────────────────────────────── */
@@ -368,5 +375,19 @@
     }, 4000);
 </script>
 @stack('scripts')
+<script>
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('SW registered: ', registration);
+                })
+                .catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+        });
+    }
+</script>
 </body>
 </html>
