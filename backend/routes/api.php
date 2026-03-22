@@ -76,7 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
         $booking->delete(); return response()->json(['message' => 'Deleted']);
     });
     Route::post('/bookings/{booking}/toggle-status', function (\App\Models\Booking $booking) {
-        $statusSequence = ['booked', 'pickup_to_hotel', 'in_hotel', 'pickup_to_plane'];
+        $statusSequence = ['booked', 'pickup_to_hotel', 'in_hotel', 'pickup_to_plane', 'cancelled'];
         $nextIndex = (array_search($booking->status, $statusSequence) + 1) % count($statusSequence);
         $booking->status = $statusSequence[$nextIndex];
         $booking->save();
