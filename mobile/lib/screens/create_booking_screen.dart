@@ -135,6 +135,127 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     }
   }
 
+  void _showCreateCrewDialog() {
+    final nameCtrl = TextEditingController();
+    final natCtrl = TextEditingController();
+    final passCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.navyLighter,
+        title: const Text('Add Crew', style: TextStyle(color: Colors.white, fontSize: 18)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: nameCtrl, decoration: _inputDecoration('Full Name', '')),
+              const SizedBox(height: 12),
+              TextField(controller: natCtrl, decoration: _inputDecoration('Nationality', '')),
+              const SizedBox(height: 12),
+              TextField(controller: passCtrl, decoration: _inputDecoration('Passport Number', '')),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: AppTheme.muted))),
+          ElevatedButton(
+            onPressed: () async {
+              if (nameCtrl.text.isEmpty) return;
+              final provider = Provider.of<BookingProvider>(context, listen: false);
+              final newCrew = await provider.createCrew({
+                'full_name': nameCtrl.text,
+                'nationality': natCtrl.text,
+                'passport_number': passCtrl.text,
+              });
+              if (newCrew != null) {
+                setState(() => _selectedCrew = newCrew);
+                if (mounted) Navigator.pop(ctx);
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCreateCompanyDialog() {
+    final nameCtrl = TextEditingController();
+    final shipCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.navyLighter,
+        title: const Text('Add Company', style: TextStyle(color: Colors.white, fontSize: 18)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameCtrl, decoration: _inputDecoration('Company Name', '')),
+            const SizedBox(height: 12),
+            TextField(controller: shipCtrl, decoration: _inputDecoration('Ship Name', '')),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: AppTheme.muted))),
+          ElevatedButton(
+            onPressed: () async {
+              if (nameCtrl.text.isEmpty || shipCtrl.text.isEmpty) return;
+              final provider = Provider.of<BookingProvider>(context, listen: false);
+              final newCompany = await provider.createCompany({
+                'company_name': nameCtrl.text,
+                'ship_name': shipCtrl.text,
+              });
+              if (newCompany != null) {
+                setState(() => _selectedCompany = newCompany);
+                if (mounted) Navigator.pop(ctx);
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCreateHotelDialog() {
+    final nameCtrl = TextEditingController();
+    final locCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.navyLighter,
+        title: const Text('Add Hotel', style: TextStyle(color: Colors.white, fontSize: 18)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameCtrl, decoration: _inputDecoration('Hotel Name', '')),
+            const SizedBox(height: 12),
+            TextField(controller: locCtrl, decoration: _inputDecoration('Location', '')),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: AppTheme.muted))),
+          ElevatedButton(
+            onPressed: () async {
+              if (nameCtrl.text.isEmpty) return;
+              final provider = Provider.of<BookingProvider>(context, listen: false);
+              final newHotel = await provider.createHotel({
+                'hotel_name': nameCtrl.text,
+                'location': locCtrl.text,
+              });
+              if (newHotel != null) {
+                setState(() => _selectedHotel = newHotel);
+                if (mounted) Navigator.pop(ctx);
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<BookingProvider>(context);
@@ -159,6 +280,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       hint: 'Select Crew Member',
                       itemLabel: (c) => c.fullName,
                       onChanged: (val) => setState(() => _selectedCrew = val),
+                      onAddPressed: _showCreateCrewDialog,
                     ),
                     const SizedBox(height: 16),
                     _buildDropdownField<Company>(
@@ -168,6 +290,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       hint: 'Select Company',
                       itemLabel: (c) => '${c.companyName} (${c.shipName})',
                       onChanged: (val) => setState(() => _selectedCompany = val),
+                      onAddPressed: _showCreateCompanyDialog,
                     ),
                     const SizedBox(height: 16),
                     _buildDropdownField<Hotel>(
@@ -177,6 +300,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       hint: 'Select Hotel',
                       itemLabel: (h) => h.hotelName,
                       onChanged: (val) => setState(() => _selectedHotel = val),
+                      onAddPressed: _showCreateHotelDialog,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -272,19 +396,43 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     required String hint,
     required String Function(T) itemLabel,
     required void Function(T?) onChanged,
+    VoidCallback? onAddPressed,
   }) {
-    return DropdownButtonFormField<T>(
+    final dropdown = DropdownButtonFormField<T>(
       value: value,
       decoration: _inputDecoration(label, hint),
       dropdownColor: AppTheme.navyLighter,
       items: items.map((item) {
         return DropdownMenuItem<T>(
           value: item,
-          child: Text(itemLabel(item)),
+          child: Text(itemLabel(item), overflow: TextOverflow.ellipsis),
         );
       }).toList(),
       onChanged: onChanged,
       validator: (val) => val == null ? 'Required' : null,
+      isExpanded: true,
+    );
+
+    if (onAddPressed == null) return dropdown;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: dropdown),
+        const SizedBox(width: 8),
+        Container(
+          height: 56, // to match typical input height
+          width: 56,
+          decoration: BoxDecoration(
+            color: AppTheme.accent.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.add, color: AppTheme.accent),
+            onPressed: onAddPressed,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -104,6 +104,52 @@ class BookingProvider with ChangeNotifier {
     return false;
   }
 
+  Future<Crew?> createCrew(Map<String, dynamic> data) async {
+    try {
+      final res = await _api.createCrew(data);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final newCrew = Crew.fromJson(res.data['crew'] ?? res.data);
+        _crews.add(newCrew);
+        notifyListeners();
+        return newCrew;
+      }
+    } catch (e) {
+      debugPrint("Create crew error: $e");
+    }
+    return null;
+  }
+
+  Future<Company?> createCompany(Map<String, dynamic> data) async {
+    try {
+      final res = await _api.createCompany(data);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final newCompany = Company.fromJson(res.data['company'] ?? res.data);
+        _companies.add(newCompany);
+        notifyListeners();
+        return newCompany;
+      }
+    } catch (e) {
+      debugPrint("Create company error: $e");
+    }
+    return null;
+  }
+
+  Future<Hotel?> createHotel(Map<String, dynamic> data) async {
+    try {
+      final res = await _api.createHotel(data);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final newHotel = Hotel.fromJson(res.data['hotel'] ?? res.data);
+        _hotels.add(newHotel);
+        notifyListeners();
+        return newHotel;
+      }
+    } catch (e) {
+      debugPrint("Create hotel error: $e");
+    }
+    return null;
+  }
+
+
 
   Future<bool> updateStatus(Booking booking, String status) async {
     try {

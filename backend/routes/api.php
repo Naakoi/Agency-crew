@@ -95,13 +95,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Crews
     Route::get('/crews', fn() => response()->json(\App\Models\Crew::orderBy('full_name')->get()));
+    Route::post('/crews', [\App\Http\Controllers\CrewController::class, 'store']);
     Route::get('/crews/{crew}', fn(\App\Models\Crew $crew) => response()->json($crew->load('bookings.hotel','bookings.company')));
 
     // Companies
     Route::get('/companies', fn() => response()->json(\App\Models\Company::all()));
+    Route::post('/companies', [\App\Http\Controllers\CompanyController::class, 'store']);
 
     // Hotels
     Route::get('/hotels', fn() => response()->json(\App\Models\Hotel::all()));
+    Route::post('/hotels', [\App\Http\Controllers\HotelController::class, 'store']);
 
     // Stats
     Route::get('/stats', function () {

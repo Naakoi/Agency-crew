@@ -60,6 +60,15 @@ class ApiService {
   Future<Response> createBooking(Map<String, dynamic> data) async => 
       await _dio.post('/bookings', data: data);
 
+  Future<Response> createCrew(Map<String, dynamic> data) async => 
+      await _dio.post('/crews', data: data);
+
+  Future<Response> createCompany(Map<String, dynamic> data) async => 
+      await _dio.post('/companies', data: data);
+
+  Future<Response> createHotel(Map<String, dynamic> data) async => 
+      await _dio.post('/hotels', data: data);
+
   Future<Response> toggleStatus(int id, {String? status}) async => 
       await _dio.post('/bookings/$id/toggle-status', data: status != null ? {'status': status} : null);
 }
