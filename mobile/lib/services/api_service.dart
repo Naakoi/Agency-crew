@@ -47,6 +47,9 @@ class ApiService {
     });
   }
 
+  Future<Response> getMe() async => await _dio.get('/me');
+
+
   Future<Response> getStats() async => await _dio.get('/stats');
   Future<Response> getBookings({String? search, String? status}) async => 
       await _dio.get('/bookings', queryParameters: {

@@ -17,7 +17,22 @@ class AuthProvider with ChangeNotifier {
   Future<void> checkAuth() async {
     _token = await _storage.read(key: 'auth_token');
     _isAuthenticated = _token != null;
+    if (_isAuthenticated) {
+      await fetchUser();
+    }
     notifyListeners();
+  }
+
+  Future<void> fetchUser() async {
+    try {
+      final res = await _api.getMe();
+      if (res.statusCode == 200) {
+        _user = res.data;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Fetch user error: $e");
+    }
   }
 
   Future<bool> login(String email, String password) async {

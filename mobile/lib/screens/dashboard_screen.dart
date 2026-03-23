@@ -35,9 +35,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: SvgPicture.asset(
-          'assets/images/logo.svg',
-          height: 32,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (Provider.of<AuthProvider>(context).user != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  'Mauri ${Provider.of<AuthProvider>(context).user!['name']}',
+                  style: const TextStyle(fontSize: 14, color: AppTheme.muted, fontWeight: FontWeight.normal),
+                ),
+              ),
+            SvgPicture.asset(
+              'assets/images/logo.svg',
+              height: 28, // slightly smaller to fit the text above
+            ),
+          ],
         ),
         centerTitle: false,
         actions: [
