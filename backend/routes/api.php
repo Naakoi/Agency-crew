@@ -47,7 +47,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookings', function (Request $r) {
         $q = \App\Models\Booking::with(['crew', 'company', 'hotel', 'statusLogs.user'])->orderByDesc('created_at');
         if ($r->status) $q->where('status', $r->status);
-        return response()->json($q->paginate(20));
+        if ($r->search) {
+            $s = $r->search;
+            $q->where(function($query) use ($s) {
+                $query->where('invoice_number', 'like', "%$s%")
+                      ->orWhereHas('crew', function($cq) use ($s) {
+                          $cq->where('full_name', 'like', "%$s%");
+                      });
+            });
+        }
+        return response()->json($q->paginate(50));
     });
     Route::post('/bookings', function (Request $r) {
         $data = $r->validate([
