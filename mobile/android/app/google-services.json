@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1034441888269",
+    "project_id": "agency-accommodation",
+    "storage_bucket": "agency-accommodation.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1034441888269:android:081d9f7c3242f755b33b44",
+        "android_client_info": {
+          "package_name": "com.cppltd.agency_crew_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqxbUpQle5c8lzWBNFir0LZgxFG7-mt2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1034441888269:android:64dbbe4c0cdb872eb33b44",
+        "android_client_info": {
+          "package_name": "com.example.agencycrew"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqxbUpQle5c8lzWBNFir0LZgxFG7-mt2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

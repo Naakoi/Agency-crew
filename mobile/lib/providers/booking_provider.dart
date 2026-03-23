@@ -11,14 +11,30 @@ class BookingProvider with ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  Map<String, int> _stats = {'total': 0, 'in_hotel': 0, 'departed': 0};
+  Map<String, int> _stats = {
+    'total': 0, 
+    'booked': 0, 
+    'pickup_to_hotel': 0, 
+    'in_hotel': 0, 
+    'pickup_to_plane': 0, 
+    'cancelled': 0
+  };
   Map<String, int> get stats => _stats;
 
-  Future<void> fetchBookings() async {
+  String? _currentSearch;
+  String? _currentStatus;
+  
+  String? get currentStatus => _currentStatus;
+  String? get currentSearch => _currentSearch;
+
+  Future<void> fetchBookings({String? search, String? status}) async {
+    if (search != null) _currentSearch = search;
+    if (status != null) _currentStatus = status;
+    
     _isLoading = true;
     notifyListeners();
     try {
-      final res = await _api.getBookings();
+      final res = await _api.getBookings(search: _currentSearch, status: _currentStatus);
       if (res.statusCode == 200) {
         final List data = res.data['data'];
         _bookings = data.map((b) => Booking.fromJson(b)).toList();
@@ -33,6 +49,12 @@ class BookingProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void clearFilters() {
+    _currentSearch = null;
+    _currentStatus = null;
+    fetchBookings();
   }
 
   Future<bool> updateStatus(Booking booking, String status) async {

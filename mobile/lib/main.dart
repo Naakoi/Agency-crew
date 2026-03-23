@@ -4,9 +4,14 @@ import 'providers/auth_provider.dart';
 import 'providers/booking_provider.dart';
 import 'theme/theme.dart';
 import 'main_wrapper.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'services/fcm_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp();
+  await FcmService.initialize();
   
   final authProvider = AuthProvider();
   await authProvider.checkAuth();

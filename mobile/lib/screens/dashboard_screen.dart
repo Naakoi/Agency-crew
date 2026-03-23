@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../theme/theme.dart';
 import '../models/models.dart';
 import 'booking_detail_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -16,6 +17,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -31,7 +34,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: SvgPicture.asset(
+          'assets/images/logo.svg',
+          height: 32,
+        ),
+        centerTitle: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, size: 20),
@@ -48,21 +55,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Stats Cards
-              Row(
+              // Search Bar
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search crew or invoice...',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  suffixIcon: _searchController.text.isNotEmpty 
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                          bookingProvider.fetchBookings(search: '');
+                        },
+                      )
+                    : null,
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.05),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                ),
+                onChanged: (val) {
+                  setState(() {});
+                  bookingProvider.fetchBookings(search: val);
+                },
+              ),
+              const SizedBox(height: 20),
+              
+              // Stats Grid
+              GridView(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  mainAxisExtent: 70,
+                ),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _buildStatCard('TOTAL', stats['total'].toString(), AppTheme.accent),
-                  const SizedBox(width: 12),
-                  _buildStatCard('IN HOTEL', stats['in_hotel'].toString(), AppTheme.green),
-                  const SizedBox(width: 12),
-                  _buildStatCard('DEPARTED', stats['departed'].toString(), AppTheme.muted),
+                  _buildStatCard('TOTAL', stats['total']?.toString() ?? '0', AppTheme.accent, 'total', bookingProvider),
+                  _buildStatCard('BOOKED', stats['booked']?.toString() ?? '0', AppTheme.accentLight, 'booked', bookingProvider),
+                  _buildStatCard('TO HOTEL', stats['pickup_to_hotel']?.toString() ?? '0', AppTheme.amber, 'pickup_to_hotel', bookingProvider),
+                  _buildStatCard('IN HOTEL', stats['in_hotel']?.toString() ?? '0', AppTheme.green, 'in_hotel', bookingProvider),
+                  _buildStatCard('TO PLANE', stats['pickup_to_plane']?.toString() ?? '0', AppTheme.teal, 'pickup_to_plane', bookingProvider),
+                  _buildStatCard('CANCELLED', stats['cancelled']?.toString() ?? '0', AppTheme.muted, 'cancelled', bookingProvider),
                 ],
               ),
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('RECENT BOOKINGS', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.muted, letterSpacing: 1.2)),
+                  Text(
+                    bookingProvider.currentStatus != null ? '${bookingProvider.currentStatus!.replaceAll('_', ' ').toUpperCase()} BOOKINGS' : 'RECENT BOOKINGS', 
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.muted, letterSpacing: 1.2)
+                  ),
+                  if (bookingProvider.currentStatus != null || (bookingProvider.currentSearch?.isNotEmpty ?? false))
+                    TextButton(
+                      onPressed: () {
+                        _searchController.clear();
+                        bookingProvider.clearFilters();
+                      },
+                      child: const Text('Clear Filters', style: TextStyle(fontSize: 12, color: AppTheme.accentLight)),
+                    ),
                   if (bookingProvider.isLoading)
                     const SizedBox(height: 14, width: 14, child: CircularProgressIndicator(strokeWidth: 2)),
                 ],
@@ -86,21 +141,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, Color color) {
-    return Expanded(
+  Widget _buildStatCard(String label, String value, Color color, String statusKey, BookingProvider provider) {
+    final bool isActive = provider.currentStatus == statusKey || (statusKey == 'total' && provider.currentStatus == null);
+
+    return InkWell(
+      onTap: () => provider.fetchBookings(status: statusKey == 'total' ? null : statusKey),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.3)),
+          color: isActive ? color.withOpacity(0.15) : color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isActive ? color : color.withOpacity(0.2), width: isActive ? 1.5 : 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color, letterSpacing: 0.5)),
-            const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white)),
+            Text(label, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: color, letterSpacing: 0.5)),
+            const SizedBox(height: 2),
+            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1)),
           ],
         ),
       ),
@@ -165,7 +225,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       if (booking.crew.biodataFile != null)
                         GestureDetector(
                           onTap: () async {
-                            final String url = "http://10.0.2.2:8000/storage/${booking.crew.biodataFile}";
+                            final String url = "https://agencycrew.cppl.com.ki/storage/${booking.crew.biodataFile}";
                             if (await canLaunchUrl(Uri.parse(url))) {
                               await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                             }

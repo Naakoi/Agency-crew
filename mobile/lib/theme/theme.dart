@@ -9,6 +9,8 @@ class AppTheme {
   static const Color green = Color(0xFF22C55E);
   static const Color red = Color(0xFFEF4444);
   static const Color textBody = Color(0xFFE2E8F0);
+  static const Color amber = Color(0xFFF59E0B);
+  static const Color amberLight = Color(0xFFFBBF24);
   static const Color muted = Color(0xFF94A3B8);
 
   static ThemeData get darkTheme {

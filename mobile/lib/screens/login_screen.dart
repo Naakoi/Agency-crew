@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../theme/theme.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -45,17 +46,15 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 80, height: 80,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [AppTheme.accent, AppTheme.teal]),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.anchor, color: Colors.white, size: 40),
+                SvgPicture.asset(
+                  'assets/images/logo.svg',
+                  width: 100,
+                  height: 100,
+                  placeholderBuilder: (context) => const CircularProgressIndicator(),
                 ),
                 const SizedBox(height: 24),
-                const Text('CPPL Agency', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white)),
-                const Text('Crew Accommodation System', style: TextStyle(color: AppTheme.muted, fontSize: 13)),
+                const Text('CPPL', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white)),
+                const Text('Agency Crew Accommodation', style: TextStyle(color: AppTheme.muted, fontSize: 13, letterSpacing: 0.5)),
                 const SizedBox(height: 48),
                 TextField(
                   controller: _email,

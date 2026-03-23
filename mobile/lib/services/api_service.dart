@@ -40,8 +40,19 @@ class ApiService {
     });
   }
 
+  Future<Response> saveFcmToken(String token) async {
+    return await _dio.post('/fcm-token', data: {
+      'token': token,
+      'device_type': 'mobile',
+    });
+  }
+
   Future<Response> getStats() async => await _dio.get('/stats');
-  Future<Response> getBookings() async => await _dio.get('/bookings');
+  Future<Response> getBookings({String? search, String? status}) async => 
+      await _dio.get('/bookings', queryParameters: {
+        if (search != null && search.isNotEmpty) 'search': search,
+        if (status != null && status != 'total') 'status': status,
+      });
   Future<Response> getCrews() async => await _dio.get('/crews');
   Future<Response> getHotels() async => await _dio.get('/hotels');
   Future<Response> getCompanies() async => await _dio.get('/companies');

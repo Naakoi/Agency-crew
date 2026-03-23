@@ -94,7 +94,7 @@ class BookingDetailScreen extends StatelessWidget {
                   Icons.sync, 
                   'Status', 
                   booking.status.toUpperCase().replaceAll('_', ' '),
-                  valueColor: booking.status == 'in_hotel' ? AppTheme.green : (booking.status == 'departed' ? AppTheme.accent : Colors.teal),
+                  valueColor: booking.status == 'in_hotel' ? AppTheme.green : (booking.status == 'cancelled' ? AppTheme.red : AppTheme.accent),
                 ),
               ],
             ),
@@ -161,7 +161,8 @@ class BookingDetailScreen extends StatelessWidget {
                         '• Hotel Booked: Accommodation confirmed.\n'
                         '• Pickup to Hotel: Crew in transit to hotel.\n'
                         '• In Hotel: Crew currently at hotel.\n'
-                        '• Pickup to Plane: Crew in transit to airport.',
+                        '• Pickup to Plane: Crew in transit to airport.\n'
+                        '• Cancelled: Booking was cancelled.',
                         style: TextStyle(color: AppTheme.textBody),
                       ),
                       actions: [
@@ -214,6 +215,7 @@ class BookingDetailScreen extends StatelessWidget {
             _statusItem(context, 'pickup_to_hotel', 'Pickup to Hotel', Icons.airport_shuttle),
             _statusItem(context, 'in_hotel', 'In Hotel', Icons.hotel),
             _statusItem(context, 'pickup_to_plane', 'Pickup to Plane', Icons.airplane_ticket),
+            _statusItem(context, 'cancelled', 'Cancelled', Icons.cancel),
           ],
         ),
       ),
