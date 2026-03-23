@@ -11,6 +11,15 @@ class BookingProvider with ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  List<Crew> _crews = [];
+  List<Company> _companies = [];
+  List<Hotel> _hotels = [];
+
+  List<Crew> get crews => _crews;
+  List<Company> get companies => _companies;
+  List<Hotel> get hotels => _hotels;
+
+
   Map<String, int> _stats = {
     'total': 0, 
     'booked': 0, 
@@ -56,6 +65,45 @@ class BookingProvider with ChangeNotifier {
     _currentStatus = null;
     fetchBookings();
   }
+
+  Future<void> fetchMetadata() async {
+    try {
+      final creRes = await _api.getCrews();
+      if (creRes.statusCode == 200) {
+        _crews = (creRes.data as List).map((c) => Crew.fromJson(c)).toList();
+      }
+      final comRes = await _api.getCompanies();
+      if (comRes.statusCode == 200) {
+        _companies = (comRes.data as List).map((c) => Company.fromJson(c)).toList();
+      }
+      final hotRes = await _api.getHotels();
+      if (hotRes.statusCode == 200) {
+        _hotels = (hotRes.data as List).map((h) => Hotel.fromJson(h)).toList();
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Fetch metadata error: $e");
+    }
+  }
+
+  Future<bool> createBooking(Map<String, dynamic> data) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final res = await _api.createBooking(data);
+      if (res.statusCode == 201) {
+        fetchBookings(); // Refresh the list
+        return true;
+      }
+    } catch (e) {
+      debugPrint("Create booking error: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+    return false;
+  }
+
 
   Future<bool> updateStatus(Booking booking, String status) async {
     try {

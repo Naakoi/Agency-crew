@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../theme/theme.dart';
 import '../models/models.dart';
 import 'booking_detail_screen.dart';
+import 'create_booking_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -133,7 +134,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Open Create Booking screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateBookingScreen(),
+            ),
+          );
         },
         backgroundColor: AppTheme.accent,
         child: const Icon(Icons.add),
@@ -145,7 +151,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final bool isActive = provider.currentStatus == statusKey || (statusKey == 'total' && provider.currentStatus == null);
 
     return InkWell(
-      onTap: () => provider.fetchBookings(status: statusKey == 'total' ? null : statusKey),
+      onTap: () {
+        if (statusKey == 'total') {
+          _searchController.clear();
+          setState(() {});
+          provider.clearFilters();
+        } else {
+          provider.fetchBookings(status: statusKey);
+        }
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -168,7 +182,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildBookingCard(Booking booking) {
-    final bool isInHotel = booking.status == 'in_hotel';
+    final String currentStatus = booking.status;
+    final DateTime? lastStatusDate = booking.statusLogs.isNotEmpty ? booking.statusLogs.last.createdAt : null;
     
     return Card(
       child: InkWell(
@@ -190,7 +205,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(child: Text(booking.crew.fullName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white))),
-                  _buildStatusBadge(isInHotel),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _buildStatusBadge(currentStatus),
+                      if (lastStatusDate != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6.0),
+                          child: Text(
+                            DateFormat('dd MMM').format(lastStatusDate),
+                            style: const TextStyle(fontSize: 9, color: AppTheme.muted, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 4),
@@ -252,18 +280,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildStatusBadge(bool inHotel) {
+  Widget _buildStatusBadge(String status) {
+    Color color;
+    String label;
+    switch (status) {
+      case 'booked': color = AppTheme.accentLight; label = 'BOOKED'; break;
+      case 'pickup_to_hotel': color = AppTheme.amber; label = 'TO HOTEL'; break;
+      case 'in_hotel': color = AppTheme.green; label = 'IN HOTEL'; break;
+      case 'pickup_to_plane': color = AppTheme.teal; label = 'TO PLANE'; break;
+      case 'cancelled': color = AppTheme.muted; label = 'CANCELLED'; break;
+      default: color = AppTheme.muted; label = status.toUpperCase();
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: (inHotel ? AppTheme.green : AppTheme.muted).withOpacity(0.15),
+        color: color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: (inHotel ? AppTheme.green : AppTheme.muted).withOpacity(0.4)),
+        border: Border.all(color: color.withOpacity(0.4)),
       ),
       child: Text(
-        inHotel ? 'IN HOTEL' : 'DEPARTED',
+        label,
         style: TextStyle(
-          color: inHotel ? AppTheme.green : AppTheme.muted,
+          color: color,
           fontSize: 10,
           fontWeight: FontWeight.w800,
         ),
