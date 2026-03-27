@@ -32,18 +32,20 @@ class BookingController extends Controller
             });
         }
 
-        $allBookings = $query->get();
-        
         $archiveStatuses = ['pickup_to_plane', 'pickup_to_ship', 'cancelled'];
         $now = now();
 
-        $archivedBookings = $allBookings->filter(function($b) use ($archiveStatuses, $now) {
-            return in_array($b->status, $archiveStatuses) && $b->check_out->isBefore($now);
-        });
+        $activeQuery = clone $query;
+        $archivedQuery = clone $query;
 
-        $activeBookings = $allBookings->reject(function($b) use ($archiveStatuses, $now) {
-            return in_array($b->status, $archiveStatuses) && $b->check_out->isBefore($now);
-        });
+        $bookings = $activeQuery->where(function($q) use ($archiveStatuses, $now) {
+            $q->whereNotIn('status', $archiveStatuses)
+              ->orWhere('check_out', '>=', $now);
+        })->paginate(12);
+
+        $archivedBookings = $archivedQuery->whereIn('status', $archiveStatuses)
+            ->where('check_out', '<', $now)
+            ->get();
 
         $stats = [
             'total'           => Booking::count(),
@@ -53,11 +55,9 @@ class BookingController extends Controller
             'pickup_to_ship'  => Booking::where('status', 'pickup_to_ship')->count(),
             'pickup_to_plane' => Booking::where('status', 'pickup_to_plane')->count(),
             'cancelled'       => Booking::where('status', 'cancelled')->count(),
-            'archived'        => $archivedBookings->count(),
+            'archived'        => Booking::whereIn('status', $archiveStatuses)->where('check_out', '<', $now)->count(),
         ];
         
-        $bookings = $activeBookings; 
-
         return view('bookings.index', compact('bookings', 'archivedBookings', 'stats'));
     }
 
