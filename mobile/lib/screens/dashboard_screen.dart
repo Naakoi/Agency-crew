@@ -104,7 +104,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  mainAxisExtent: 70,
+                  mainAxisExtent: 65,
                 ),
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -113,6 +113,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildStatCard('BOOKED', stats['booked']?.toString() ?? '0', AppTheme.accentLight, 'booked', bookingProvider),
                   _buildStatCard('TO HOTEL', stats['pickup_to_hotel']?.toString() ?? '0', AppTheme.amber, 'pickup_to_hotel', bookingProvider),
                   _buildStatCard('IN HOTEL', stats['in_hotel']?.toString() ?? '0', AppTheme.green, 'in_hotel', bookingProvider),
+                  _buildStatCard('TO SHIP', stats['pickup_to_ship']?.toString() ?? '0', Colors.purple, 'pickup_to_ship', bookingProvider),
                   _buildStatCard('TO PLANE', stats['pickup_to_plane']?.toString() ?? '0', AppTheme.teal, 'pickup_to_plane', bookingProvider),
                   _buildStatCard('CANCELLED', stats['cancelled']?.toString() ?? '0', AppTheme.muted, 'cancelled', bookingProvider),
                 ],
@@ -301,6 +302,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 'booked': color = AppTheme.accentLight; label = 'BOOKED'; break;
       case 'pickup_to_hotel': color = AppTheme.amber; label = 'TO HOTEL'; break;
       case 'in_hotel': color = AppTheme.green; label = 'IN HOTEL'; break;
+      case 'pickup_to_ship': color = Colors.purple; label = 'TO SHIP'; break;
       case 'pickup_to_plane': color = AppTheme.teal; label = 'TO PLANE'; break;
       case 'cancelled': color = AppTheme.muted; label = 'CANCELLED'; break;
       default: color = AppTheme.muted; label = status.toUpperCase();

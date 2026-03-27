@@ -29,6 +29,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     'booked',
     'pickup_to_hotel',
     'in_hotel',
+    'pickup_to_ship',
     'pickup_to_plane',
   ];
 
@@ -130,6 +131,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       case 'booked': return 'Booked';
       case 'pickup_to_hotel': return 'Pickup to Hotel';
       case 'in_hotel': return 'In Hotel';
+      case 'pickup_to_ship': return 'Pick up to Ship';
       case 'pickup_to_plane': return 'Pickup to Plane';
       default: return status;
     }

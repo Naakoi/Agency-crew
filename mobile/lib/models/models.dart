@@ -92,6 +92,7 @@ class StatusLog {
   String get statusLabel {
     switch (status) {
       case 'in_hotel': return 'In Hotel';
+      case 'pickup_to_ship': return 'Pick up to Ship';
       case 'departed': return 'Departed';
       case 'picked_up': return 'Picked Up';
       default: return status;
