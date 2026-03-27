@@ -107,6 +107,7 @@
             <option value="booked"           {{ old('status','booked') === 'booked' ? 'selected' : '' }}>Hotel Booked</option>
             <option value="pickup_to_hotel"  {{ old('status') === 'pickup_to_hotel' ? 'selected' : '' }}>Pickup to Hotel</option>
             <option value="in_hotel"         {{ old('status') === 'in_hotel' ? 'selected' : '' }}>In Hotel</option>
+            <option value="pickup_to_ship"  {{ old('status') === 'pickup_to_ship' ? 'selected' : '' }}>Pick up to Ship</option>
             <option value="pickup_to_plane"  {{ old('status') === 'pickup_to_plane' ? 'selected' : '' }}>Pickup to Plane</option>
             <option value="cancelled"        {{ old('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
         </select>

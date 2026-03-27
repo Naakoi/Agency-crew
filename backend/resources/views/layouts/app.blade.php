@@ -143,6 +143,8 @@
         }
         .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
         .badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+        .badge-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+        .badge-teal  { background: rgba(12,184,168,0.15); color: var(--teal); }
         .badge-gray  { background: rgba(148,163,184,0.15); color: var(--muted); }
 
         /* ── Stats ───────────────────────────────────────────────── */

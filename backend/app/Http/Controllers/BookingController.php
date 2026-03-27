@@ -32,16 +32,33 @@ class BookingController extends Controller
             });
         }
 
-        $bookings = $query->paginate(12);
+        $allBookings = $query->get();
+        
+        $archiveStatuses = ['pickup_to_plane', 'pickup_to_ship', 'cancelled'];
+        $now = now();
+
+        $archivedBookings = $allBookings->filter(function($b) use ($archiveStatuses, $now) {
+            return in_array($b->status, $archiveStatuses) && $b->check_out->isBefore($now);
+        });
+
+        $activeBookings = $allBookings->reject(function($b) use ($archiveStatuses, $now) {
+            return in_array($b->status, $archiveStatuses) && $b->check_out->isBefore($now);
+        });
+
         $stats = [
             'total'           => Booking::count(),
             'booked'          => Booking::where('status', 'booked')->count(),
             'pickup_to_hotel' => Booking::where('status', 'pickup_to_hotel')->count(),
             'in_hotel'        => Booking::where('status', 'in_hotel')->count(),
+            'pickup_to_ship'  => Booking::where('status', 'pickup_to_ship')->count(),
             'pickup_to_plane' => Booking::where('status', 'pickup_to_plane')->count(),
             'cancelled'       => Booking::where('status', 'cancelled')->count(),
+            'archived'        => $archivedBookings->count(),
         ];
-        return view('bookings.index', compact('bookings', 'stats'));
+        
+        $bookings = $activeBookings; 
+
+        return view('bookings.index', compact('bookings', 'archivedBookings', 'stats'));
     }
 
     public function create()
@@ -64,7 +81,7 @@ class BookingController extends Controller
             'check_out'      => 'required|date|after:check_in',
             'invoice_number' => 'nullable|string|max:100',
             'remarks'        => 'nullable|string',
-            'status'         => 'required|in:booked,pickup_to_hotel,in_hotel,pickup_to_plane',
+            'status'         => 'required|in:booked,pickup_to_hotel,in_hotel,pickup_to_ship,pickup_to_plane',
         ]);
 
         $booking = Booking::create($data);
@@ -103,7 +120,7 @@ class BookingController extends Controller
             'check_out'      => 'required|date|after:check_in',
             'invoice_number' => 'nullable|string|max:100',
             'remarks'        => 'nullable|string',
-            'status'         => 'required|in:booked,pickup_to_hotel,in_hotel,pickup_to_plane',
+            'status'         => 'required|in:booked,pickup_to_hotel,in_hotel,pickup_to_ship,pickup_to_plane',
         ]);
 
         $oldStatus = $booking->status;
@@ -129,7 +146,7 @@ class BookingController extends Controller
     public function toggle(Request $request, Booking $booking)
     {
         $oldStatus = $booking->status;
-        $statusSequence = ['booked', 'pickup_to_hotel', 'in_hotel', 'pickup_to_plane', 'cancelled'];
+        $statusSequence = ['booked', 'pickup_to_hotel', 'in_hotel', 'pickup_to_ship', 'pickup_to_plane', 'cancelled'];
         
         if ($request->has('status') && in_array($request->status, $statusSequence)) {
             $booking->status = $request->status;

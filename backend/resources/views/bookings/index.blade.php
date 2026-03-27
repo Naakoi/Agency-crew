@@ -13,7 +13,7 @@
 </div>
 
 {{-- Stats --}}
-<div class="stats-row" style="grid-template-columns: repeat(6, 1fr); margin-bottom: 24px;">
+<div class="stats-row" style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; margin-bottom: 24px;">
     <a href="{{ route('bookings.index') }}" class="stat-card" style="text-decoration: none; display: block; background: {{ !request('status') ? 'rgba(26,120,194,0.15)' : 'var(--card)' }}; border-color: {{ !request('status') ? 'var(--accent)' : 'var(--border)' }};">
         <div class="stat-label">Total</div>
         <div class="stat-value">{{ $stats['total'] }}</div>
@@ -30,6 +30,10 @@
         <div class="stat-label">In Hotel</div>
         <div class="stat-value" style="color:#22c55e;">{{ $stats['in_hotel'] }}</div>
     </a>
+    <a href="{{ route('bookings.index', ['status' => 'pickup_to_ship']) }}" class="stat-card" style="text-decoration: none; display: block; background: {{ request('status') === 'pickup_to_ship' ? 'rgba(168,85,247,0.15)' : 'var(--card)' }}; border-color: {{ request('status') === 'pickup_to_ship' ? '#a855f7' : 'var(--border)' }};">
+        <div class="stat-label">To Ship</div>
+        <div class="stat-value" style="color:#a855f7;">{{ $stats['pickup_to_ship'] }}</div>
+    </a>
     <a href="{{ route('bookings.index', ['status' => 'pickup_to_plane']) }}" class="stat-card" style="text-decoration: none; display: block; background: {{ request('status') === 'pickup_to_plane' ? 'rgba(12,184,168,0.15)' : 'var(--card)' }}; border-color: {{ request('status') === 'pickup_to_plane' ? 'var(--teal)' : 'var(--border)' }};">
         <div class="stat-label">To Plane</div>
         <div class="stat-value" style="color:#0cb8a8;">{{ $stats['pickup_to_plane'] }}</div>
@@ -38,6 +42,10 @@
         <div class="stat-label">Cancelled</div>
         <div class="stat-value" style="color:var(--red);">{{ $stats['cancelled'] }}</div>
     </a>
+    <div class="stat-card" style="background: rgba(148,163,184,0.08); border-color: var(--border);">
+        <div class="stat-label">Archived</div>
+        <div class="stat-value" style="color:var(--muted);">{{ $stats['archived'] }}</div>
+    </div>
 </div>
 
 <style>
@@ -56,6 +64,7 @@
             <option value="booked"           {{ request('status') === 'booked' ? 'selected' : '' }}>Hotel Booked</option>
             <option value="pickup_to_hotel"  {{ request('status') === 'pickup_to_hotel' ? 'selected' : '' }}>Pickup to Hotel</option>
             <option value="in_hotel"         {{ request('status') === 'in_hotel' ? 'selected' : '' }}>In Hotel</option>
+            <option value="pickup_to_ship"  {{ request('status') === 'pickup_to_ship' ? 'selected' : '' }}>Pick up to Ship</option>
             <option value="pickup_to_plane"  {{ request('status') === 'pickup_to_plane' ? 'selected' : '' }}>Pickup to Plane</option>
             <option value="cancelled"        {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
             <option value="assigned_to_me"   {{ request('status') === 'assigned_to_me' ? 'selected' : '' }}>Assigned to Me</option>
@@ -95,6 +104,7 @@
                     • <b>Hotel Booked</b>: Booking created.<br>
                     • <b>Pickup to Hotel</b>: Crew being transported to hotel.<br>
                     • <b>In Hotel</b>: Crew is staying at the hotel.<br>
+                    • <b>Pick up to Ship</b>: Crew leaving hotel for ship.<br>
                     • <b>Pickup to Plane</b>: Crew leaving hotel for flight.
                 </span>
             </div>
@@ -136,6 +146,7 @@
                     <option value="booked"           {{ $booking->status === 'booked' ? 'selected' : '' }}>Hotel Booked</option>
                     <option value="pickup_to_hotel"  {{ $booking->status === 'pickup_to_hotel' ? 'selected' : '' }}>Pickup to Hotel</option>
                     <option value="in_hotel"         {{ $booking->status === 'in_hotel' ? 'selected' : '' }}>In Hotel</option>
+                    <option value="pickup_to_ship"  {{ $booking->status === 'pickup_to_ship' ? 'selected' : '' }}>Pick up to Ship</option>
                     <option value="pickup_to_plane"  {{ $booking->status === 'pickup_to_plane' ? 'selected' : '' }}>Pickup to Plane</option>
                     <option value="cancelled"        {{ $booking->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                 </select>
@@ -173,6 +184,99 @@
     @endforeach
 </div>
 <div>{{ $bookings->appends(request()->query())->links('pagination::simple-tailwind') }}</div>
+
+@if($archivedBookings->count())
+<div id="archiveSection" class="card" style="margin-top: 40px; transition: all 0.3s ease;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">
+            <i class="fas fa-archive" style="margin-right: 8px;"></i> Archived Bookings
+            <small style="font-weight: 400; text-transform: none; margin-left: 10px; opacity: 0.6;">(Completed & Checked Out)</small>
+        </h3>
+        <button id="toggleArchiveBtn" class="btn btn-secondary btn-sm">
+            <i class="fas fa-expand-alt" id="maximizeIcon"></i> <span id="maximizeText">Maximize</span>
+        </button>
+    </div>
+    
+    <div class="table-wrap" id="archiveTable" style="max-height: 300px; overflow-y: auto; transition: max-height 0.3s ease;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Crew</th>
+                    <th>Hotel</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Check Out</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($archivedBookings as $b)
+                <tr>
+                    <td>
+                        <div style="font-weight: 600;">{{ $b->crew->full_name }}</div>
+                        <div style="font-size: 11px; color: var(--muted);">{{ $b->crew_title }}</div>
+                    </td>
+                    <td>{{ $b->hotel->hotel_name }}</td>
+                    <td>{{ $b->company->company_name }}</td>
+                    <td>
+                        <span class="badge {{ $b->status_color_class }}" style="font-size: 10px;">{{ $b->status_label }}</span>
+                    </td>
+                    <td>{{ $b->check_out->format('d M Y') }}</td>
+                    <td style="text-align: right;">
+                        <a href="{{ route('bookings.show', $b) }}" class="btn btn-secondary btn-sm" style="padding: 4px 8px;">View</a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    (function() {
+        const archiveSection = document.getElementById('archiveSection');
+        const archiveTable = document.getElementById('archiveTable');
+        const toggleArchiveBtn = document.getElementById('toggleArchiveBtn');
+        const maximizeIcon = document.getElementById('maximizeIcon');
+        const maximizeText = document.getElementById('maximizeText');
+        let isMaximized = false;
+
+        if (toggleArchiveBtn) {
+            toggleArchiveBtn.addEventListener('click', () => {
+                isMaximized = !isMaximized;
+                if (isMaximized) {
+                    archiveSection.style.position = 'fixed';
+                    archiveSection.style.top = '20px';
+                    archiveSection.style.left = '270px'; 
+                    archiveSection.style.right = '30px';
+                    archiveSection.style.bottom = '20px';
+                    archiveSection.style.zIndex = '1000';
+                    archiveSection.style.marginTop = '0';
+                    archiveTable.style.maxHeight = 'calc(100vh - 120px)';
+                    maximizeIcon.classList.replace('fa-expand-alt', 'fa-compress-alt');
+                    maximizeText.innerText = 'Minimize';
+                    document.body.style.overflow = 'hidden';
+                    
+                    if (window.innerWidth <= 1024) {
+                        archiveSection.style.left = '15px';
+                        archiveSection.style.right = '15px';
+                    }
+                } else {
+                    archiveSection.style.position = 'static';
+                    archiveSection.style.marginTop = '40px';
+                    archiveTable.style.maxHeight = '300px';
+                    maximizeIcon.classList.replace('fa-compress-alt', 'fa-expand-alt');
+                    maximizeText.innerText = 'Maximize';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+    })();
+</script>
+@endpush
+@endif
+
 @else
 <div class="card" style="text-align:center;padding:60px 20px;">
     <i class="fas fa-calendar-times" style="font-size:48px;color:#334155;margin-bottom:16px;display:block;"></i>

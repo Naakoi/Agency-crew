@@ -95,6 +95,7 @@
             <option value="booked"           {{ $booking->status === 'booked' ? 'selected' : '' }}>Hotel Booked</option>
             <option value="pickup_to_hotel"  {{ $booking->status === 'pickup_to_hotel' ? 'selected' : '' }}>Pickup to Hotel</option>
             <option value="in_hotel"         {{ $booking->status === 'in_hotel' ? 'selected' : '' }}>In Hotel</option>
+            <option value="pickup_to_ship"  {{ $booking->status === 'pickup_to_ship' ? 'selected' : '' }}>Pick up to Ship</option>
             <option value="pickup_to_plane"  {{ $booking->status === 'pickup_to_plane' ? 'selected' : '' }}>Pickup to Plane</option>
             <option value="cancelled"        {{ $booking->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
         </select>

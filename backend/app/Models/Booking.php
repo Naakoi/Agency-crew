@@ -60,6 +60,7 @@ class Booking extends Model
             'booked'            => 'Hotel Booked',
             'pickup_to_hotel'   => 'Pickup to Hotel',
             'in_hotel'          => 'In Hotel',
+            'pickup_to_ship'    => 'Pick up to Ship',
             'pickup_to_plane'   => 'Pickup to Plane',
             'cancelled'         => 'Cancelled',
         ][$this->status] ?? ucfirst($this->status);
@@ -71,6 +72,7 @@ class Booking extends Model
             'booked'            => 'badge-blue',
             'pickup_to_hotel'   => 'badge-amber',
             'in_hotel'          => 'badge-green',
+            'pickup_to_ship'    => 'badge-purple',
             'pickup_to_plane'   => 'badge-teal',
             'cancelled'         => 'badge-red',
         ][$this->status] ?? 'badge-gray';
